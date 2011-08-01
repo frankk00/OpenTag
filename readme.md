@@ -39,4 +39,3 @@ If you make changes to it, we strongly encourage you to submit a pull request so
 
 If you find issues with it, please report them via the [Issues Tab](https://github.com/QubitProducts/OpenTag/issues).
 
-### [[How it works]]
