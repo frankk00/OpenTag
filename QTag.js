@@ -112,10 +112,16 @@ q.html.HtmlInjector = {};
 
 q.html.HtmlInjector.inject = function (el, injectStart, str, cb, parentNode) {
   if (str.toLowerCase().indexOf("<script") >= 0) {
-    var i, ii, d, scripts, script, contents;
+    var i, ii, d, scriptsRaw, scripts, script, contents;
     d = document.createElement("div");
     d.innerHTML = str;
-    scripts = d.getElementsByTagName("script");
+    scriptsRaw = d.getElementsByTagName("script");
+    //Make copy of the raw array that is given by the browser, as the
+    //raw array changes as the dom changes.
+    scripts = [];
+    for (i = 0, ii = scriptsRaw.length; i < ii; i += 1) {
+      scripts.push(scriptsRaw[i]); 
+    }
     contents = [];
     for (i = 0, ii = scripts.length; i < ii; i += 1) {
       script = scripts[i];
@@ -124,13 +130,15 @@ q.html.HtmlInjector.inject = function (el, injectStart, str, cb, parentNode) {
       } else {
         contents.push({script: script.innerHTML});
       }
+      //Note: this line changes the length of scriptsRaw.
       script.parentNode.removeChild(script);
     }
     if (d.innerHTML) {
-      el.innerHTML = injectStart ? (d.innerHTML + el.innerHTML) :
+      el.innerHTML = injectStart ? (d.innerHTML + el.innerHTML) : 
         (el.innerHTML + d.innerHTML);
     }
     q.html.HtmlInjector.loadScripts(contents, 0, cb, el);
+    //use document fragments if adding to multiple elements!
   } else {
     el.innerHTML = injectStart ? (str + el.innerHTML) : (el.innerHTML + str);
     cb();
